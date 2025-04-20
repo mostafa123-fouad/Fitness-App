@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "209488415256",
+    "project_id": "fitness-68a50",
+    "storage_bucket": "fitness-68a50.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209488415256:android:e1f6a75a3540af5f60916d",
+        "android_client_info": {
+          "package_name": "com.aravind.composefitnessapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtD5SahuFkzLrOsbwvhcP79t6h2Wskd4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
