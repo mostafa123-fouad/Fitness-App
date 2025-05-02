@@ -181,13 +181,10 @@ fun CompleteProfileScreen(onCompleteProfile: () -> Unit) {
             // Fetching the Local Context
             val mContext = LocalContext.current
 
-            // Declaring integer values
-            // for year, month and day
             val mYear: Int
             val mMonth: Int
             val mDay: Int
 
-            // Initializing a Calendar
             val mCalendar = Calendar.getInstance()
 
             // Fetching current year, month and day

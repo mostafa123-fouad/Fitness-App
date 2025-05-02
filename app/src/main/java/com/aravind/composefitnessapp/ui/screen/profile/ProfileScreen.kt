@@ -1,5 +1,6 @@
 package com.aravind.composefitnessapp.ui.screen.profile
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,12 +38,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aravind.composefitnessapp.MainActivity
 import com.aravind.composefitnessapp.R
 import com.aravind.composefitnessapp.ui.theme.Black
 import com.aravind.composefitnessapp.ui.theme.GradientEnd
@@ -57,6 +59,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ProfileScreen() {
+    var isDialogShown  by remember{mutableStateOf(false)}
+    val context = LocalContext.current
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     val db = FirebaseFirestore.getInstance()
 
@@ -163,12 +167,12 @@ fun ProfileScreen() {
                     }
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // عرض البيانات الأخرى
+
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Card لعرض ال Height
+
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             modifier = Modifier
@@ -214,7 +218,7 @@ fun ProfileScreen() {
                             }
                         }
                         Spacer(modifier = Modifier.width(18.dp))
-                        // Card لعرض ال Weight
+
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             modifier = Modifier
@@ -260,7 +264,7 @@ fun ProfileScreen() {
                             }
                         }
                         Spacer(modifier = Modifier.width(18.dp))
-                        // Card لعرض ال Age
+
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             modifier = Modifier
@@ -450,6 +454,7 @@ fun ProfileScreen() {
                         }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
+
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         modifier = Modifier
@@ -498,10 +503,18 @@ fun ProfileScreen() {
                                         .weight(1f)
                                         .padding(start = 12.dp)
                                 )
+
                                 Switch(
                                     checked = checked,
-                                    onCheckedChange = {
-                                        checked = it
+                                    onCheckedChange = {isChecked->
+                                        checked = isChecked
+                                        if (isChecked) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                (context as? MainActivity)?.handlePermission()?.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                            } else {
+                                                (context as? MainActivity)?.showNotification()
+                                            }
+                                        }
                                     },
                                     modifier = Modifier.scale(0.7f),
                                     colors = SwitchDefaults.colors(
@@ -627,18 +640,20 @@ fun ProfileScreen() {
                                     contentDescription = null,
                                     modifier = Modifier
                                 )
+                                if (isDialogShown) {
+                                    (context as? MainActivity)?.PermissionDeniedDialog {
+                                        isDialogShown = false
+                                    }
                             }
 
                         }
                     }
                 }
             }
-        }
-    )
-}
 
-@Composable
-@Preview
-fun ProfileScreenPreview() {
-    ProfileScreen()
-}
+        }
+
+
+})
+        }
+

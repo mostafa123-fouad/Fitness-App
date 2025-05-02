@@ -101,8 +101,7 @@ fun updateProfile(
     dateOfBirth: String,
     weight: String,
     height: String,
-    age:Int
-
+    age:String
     ) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     val db = FirebaseFirestore.getInstance()
@@ -113,7 +112,8 @@ fun updateProfile(
             "gender" to gender,
             "dob" to dateOfBirth,
             "weight" to weight,
-            "height" to height
+            "height" to height,
+            "age" to age
         )
 
 
@@ -375,7 +375,7 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                 onClick = {
                     phoneError = !isValidEgyptianPhone(phoneNumber)
 
-
+                     Log.d("error","error occured")
                     val passwordError = password.length < 8 || !password.any { it.isDigit() } || !password.any { it.isLetter() } || !password.any { !it.isLetterOrDigit() }
 
                     if (passwordError) {

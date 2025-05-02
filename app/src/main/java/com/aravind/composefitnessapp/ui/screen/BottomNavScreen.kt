@@ -8,4 +8,5 @@ sealed class BottomNavScreen(var title:String, var iconSelected:Int, var iconUnS
     object ActivityTracker: BottomNavScreen("Activity",R.drawable.ic_menu_activity_selected,R.drawable.ic_menu_activity,"activity_tracker_screen")
     object ProgressPhoto: BottomNavScreen("Photo",R.drawable.ic_menu_photo_selected,R.drawable.ic_menu_photo,"progress_photo_screen")
     object Profile: BottomNavScreen("Profile",R.drawable.ic_menu_profile_selected,R.drawable.ic_menu_profile,"profile_screen")
+    object Notification: BottomNavScreen("notifications_screen_route",R.drawable.ic_notifications_24, R.drawable.ic_icon_notification,"notifications_screen_route")
 }

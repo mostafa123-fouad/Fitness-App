@@ -1,11 +1,9 @@
 package com.aravind.composefitnessapp.ui.screen.choosegoal
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,18 +34,19 @@ import com.aravind.composefitnessapp.R
 import com.aravind.composefitnessapp.ui.theme.Black
 import com.aravind.composefitnessapp.ui.theme.GradientEnd
 import com.aravind.composefitnessapp.ui.theme.GradientStart
-import com.aravind.composefitnessapp.ui.theme.Grey1
 import com.aravind.composefitnessapp.ui.theme.poppinsFamily
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChooseGoalScreen(onGoalConfirmed: () -> Unit) {
     val chooseGoalModelList = ChooseGoalModel.getData()
-    val scope = rememberCoroutineScope()
-    val pageState = rememberPagerState {
-        chooseGoalModelList.size
+    if (chooseGoalModelList.isEmpty()) {
+        // Handle empty data case to prevent crashes
+        Text("No goals available", modifier = Modifier.fillMaxSize())
+        return
     }
+    val scope = rememberCoroutineScope()
+    val pageState = rememberPagerState { chooseGoalModelList.size }
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(35.dp))
         Text(
@@ -68,7 +67,7 @@ fun ChooseGoalScreen(onGoalConfirmed: () -> Unit) {
         Spacer(modifier = Modifier.height(25.dp))
         HorizontalPager(
             state = pageState,
-                    modifier = Modifier
+            modifier = Modifier
                 .weight(1f)
                 .align(alignment = Alignment.Start)
                 .padding(20.dp)
@@ -79,7 +78,6 @@ fun ChooseGoalScreen(onGoalConfirmed: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 25.dp, end = 25.dp, bottom = 25.dp)
-
                 .background(
                     brush = Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
                     shape = ButtonDefaults.shape
@@ -94,7 +92,6 @@ fun ChooseGoalScreen(onGoalConfirmed: () -> Unit) {
             )
         }
     }
-
 }
 
 @Composable
