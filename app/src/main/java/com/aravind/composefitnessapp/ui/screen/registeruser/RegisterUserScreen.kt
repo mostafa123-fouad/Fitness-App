@@ -235,7 +235,7 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                 )
                 if (phoneError) {
                     Text(
-                        text = "رقم الهاتف غير صالح. يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويكون 11 رقم.",
+                        text = "Invalid phone number. It must start with 010, 011, 012, or 015 and be 11 digits long.",
                         color = Color.Red,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp, start = 4.dp)

@@ -19,16 +19,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.net.toUri
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aravind.composefitnessapp.ui.screen.Screen
 import com.aravind.composefitnessapp.ui.screen.choosegoal.ChooseGoalScreen
 import com.aravind.composefitnessapp.ui.screen.completeprofile.CompleteProfileScreen
+import com.aravind.composefitnessapp.ui.screen.contactus.ContactUsScreen
 import com.aravind.composefitnessapp.ui.screen.getstarted.GetStartedScreen
 import com.aravind.composefitnessapp.ui.screen.main.MainScreen
 import com.aravind.composefitnessapp.ui.screen.onboarding.OnBoardingScreen
+import com.aravind.composefitnessapp.ui.screen.privacypolicy.PrivacyPolicyScreen
 import com.aravind.composefitnessapp.ui.screen.registeruser.RegisterUserScreen
 import com.aravind.composefitnessapp.ui.theme.ComposeFitnessAppTheme
 import com.google.firebase.FirebaseApp
@@ -61,13 +62,15 @@ class MainActivity : ComponentActivity() {
                         ChooseGoalScreen(onGoalConfirmed = { navController.navigate(Screen.Main.route) })
                     }
                     composable(Screen.Main.route) {
-                        MainScreen(navigateTo = navigateTo) // Pass only navigateTo
+                        MainScreen(navigateTo = navigateTo, mainNavController = navController)
                     }
+
+
                 }
             }
         }
     }
-     fun handlePermission(): ActivityResultLauncher<String> {
+    fun handlePermission(): ActivityResultLauncher<String> {
         val handler=registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted->
             if(isGranted){
                 // show notification
@@ -81,7 +84,7 @@ class MainActivity : ComponentActivity() {
         return handler
     }
 
-     fun createChannel(){
+    fun createChannel(){
         val channel= NotificationChannel("1","Main Channel", NotificationManager.IMPORTANCE_HIGH)
         channel.description="Some Channel description ..."
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -89,8 +92,8 @@ class MainActivity : ComponentActivity() {
     }
 
     @SuppressLint("MissingPermission")
-     fun showNotification(){
-        val bitMap= BitmapFactory.decodeResource(resources,R.drawable.compose_quote)
+    fun showNotification(){
+
         val builder= NotificationCompat.Builder(this,"1")
         val i = Intent(this, MainActivity::class.java).apply {
             putExtra("navigateTo", "notifications_screen_route")
@@ -101,7 +104,6 @@ class MainActivity : ComponentActivity() {
             .setContentTitle("Fitness Notification")
             .setContentText("You activated the notification successfully!")
             .setAutoCancel(true)
-            .setStyle(NotificationCompat.BigPictureStyle().bigPicture(bitMap))
             .setContentIntent(pendingIntent)
         NotificationManagerCompat.from(this).notify(500,builder.build())
 

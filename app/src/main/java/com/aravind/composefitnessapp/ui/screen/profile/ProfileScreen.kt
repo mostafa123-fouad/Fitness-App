@@ -1,5 +1,6 @@
 package com.aravind.composefitnessapp.ui.screen.profile
 
+import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +47,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.aravind.composefitnessapp.MainActivity
 import com.aravind.composefitnessapp.R
 import com.aravind.composefitnessapp.ui.theme.Black
@@ -58,7 +63,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navController: NavHostController, mainNavController: NavController?) {
     var isDialogShown  by remember{mutableStateOf(false)}
     val context = LocalContext.current
     val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -561,6 +566,9 @@ fun ProfileScreen() {
                                     top = 18.dp,
                                     bottom = 16.dp
                                 )
+                                    .clickable {
+                                        navController.navigate("contact_us_route")
+                                    }
                             ) {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_leading_contact),
@@ -590,6 +598,9 @@ fun ProfileScreen() {
                                     end = 20.dp,
                                     bottom = 16.dp
                                 )
+                                    .clickable {
+                                        navController.navigate("privacy_route")
+                                    }
                             ) {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_leading_privacy),
@@ -612,6 +623,31 @@ fun ProfileScreen() {
                                     modifier = Modifier
                                 )
                             }
+                            var showLogoutDialog by remember { mutableStateOf(false) }
+
+                            if (showLogoutDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showLogoutDialog = false },
+                                    title = { Text("Confirm Logout") },
+                                    text = { Text("Are you sure you want to logout?") },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            showLogoutDialog = false
+                                            FirebaseAuth.getInstance().signOut()
+                                            val intent = Intent(context, MainActivity::class.java)
+                                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                            context.startActivity(intent)
+                                        }) {
+                                            Text("Logout")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showLogoutDialog = false }) {
+                                            Text("Cancel")
+                                        }
+                                    }
+                                )
+                            }
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(
@@ -619,14 +655,17 @@ fun ProfileScreen() {
                                     end = 20.dp,
                                     bottom = 16.dp
                                 )
+                                    .clickable {
+                                        showLogoutDialog = true
+                                    }
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_leading_settings),
+                                    painter = painterResource(id = R.drawable.logout_24),
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Text(
-                                    "Settings",
+                                    "Logout",
                                     color = Grey1,
                                     fontSize = 12.sp,
                                     fontFamily = poppinsFamily,
@@ -640,20 +679,12 @@ fun ProfileScreen() {
                                     contentDescription = null,
                                     modifier = Modifier
                                 )
-                                if (isDialogShown) {
-                                    (context as? MainActivity)?.PermissionDeniedDialog {
-                                        isDialogShown = false
-                                    }
                             }
-
                         }
                     }
                 }
             }
-
         }
-
-
-})
-        }
+    )
+}
 

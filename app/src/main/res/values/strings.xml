@@ -24,5 +24,6 @@
     <string name="loose_fat_title">Lose a Fat</string>
     <string name="loose_fat_desc">I have over 20 lbs to lose. I want to drop all this fat and gain muscle mass</string>
     <string name="title_activity_notification">Notification</string>
+    <string name="title_activity_contact_us">ContactUs</string>
 
 </resources>

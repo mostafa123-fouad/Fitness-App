@@ -1,5 +1,4 @@
 package com.aravind.composefitnessapp.ui.screen.completeprofile
-
 import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.foundation.Image

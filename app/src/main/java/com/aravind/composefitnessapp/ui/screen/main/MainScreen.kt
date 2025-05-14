@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -24,12 +24,14 @@ import androidx.navigation.compose.rememberNavController
 import com.aravind.composefitnessapp.ui.screen.BottomNavScreen
 import com.aravind.composefitnessapp.ui.screen.NotificationsScreen
 import com.aravind.composefitnessapp.ui.screen.activitytracker.ActivityTrackerScreen
+import com.aravind.composefitnessapp.ui.screen.contactus.ContactUsScreen
 import com.aravind.composefitnessapp.ui.screen.home.HomeScreen
+import com.aravind.composefitnessapp.ui.screen.privacypolicy.PrivacyPolicyScreen
 import com.aravind.composefitnessapp.ui.screen.profile.ProfileScreen
 import com.aravind.composefitnessapp.ui.screen.progressphoto.ProgressPhotoScreen
 
 @Composable
-fun MainScreen(navigateTo: String? = null) {
+fun MainScreen(navigateTo: String? = null,mainNavController: NavController? = null) {
     val navController = rememberNavController() // Create a new NavHostController
     val items = listOf(
         BottomNavScreen.Home,
@@ -85,8 +87,12 @@ fun MainScreen(navigateTo: String? = null) {
             composable(BottomNavScreen.Home.route) { HomeScreen() }
             composable(BottomNavScreen.ActivityTracker.route) { ActivityTrackerScreen() }
             composable(BottomNavScreen.ProgressPhoto.route) { ProgressPhotoScreen() }
-            composable(BottomNavScreen.Profile.route) { ProfileScreen() }
+            composable(BottomNavScreen.Profile.route) {
+                ProfileScreen(navController = navController, mainNavController = mainNavController)
+            }
             composable(BottomNavScreen.Notification.route) { NotificationsScreen() }
+            composable("contact_us_route") { ContactUsScreen() }
+            composable("privacy_route") { PrivacyPolicyScreen() }
         }
     }
 
