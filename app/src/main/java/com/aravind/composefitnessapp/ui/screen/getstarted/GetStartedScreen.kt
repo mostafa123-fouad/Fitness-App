@@ -1,5 +1,6 @@
 package com.aravind.composefitnessapp.ui.screen.getstarted
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -23,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aravind.composefitnessapp.R
 import com.aravind.composefitnessapp.ui.theme.Black
 import com.aravind.composefitnessapp.ui.theme.GradientEnd
 import com.aravind.composefitnessapp.ui.theme.GradientStart
@@ -33,8 +38,14 @@ import com.aravind.composefitnessapp.ui.theme.poppinsFamily
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun GetStartedScreen(onGetStarted: () -> Unit) {
-    Box {
+    Box(modifier = Modifier.fillMaxSize()) {
 
+        Image(
+            painter = painterResource(id = R.drawable.energia), // استبدل بـ R.drawable.اسم_صورتك
+            contentDescription = null, // وصف الصورة لأغراض إمكانية الوصول
+            contentScale = ContentScale.Crop, // لتغطية كامل المساحة مع اقتصاص إذا لزم الأمر
+            modifier = Modifier.fillMaxSize()
+        )
 
         Column(
             verticalArrangement = Arrangement.Center,
@@ -58,7 +69,7 @@ fun GetStartedScreen(onGetStarted: () -> Unit) {
                 }
                 withStyle(
                     style = SpanStyle(
-                        color = Black, fontSize = 34.sp,
+                        color = Color.White, fontSize = 34.sp,
                         fontFamily = poppinsFamily, fontWeight = FontWeight.Normal
                     )
                 ) {

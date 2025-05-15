@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "300335497711",
+    "project_id": "fitness-app-c2926",
+    "storage_bucket": "fitness-app-c2926.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300335497711:android:7d205edad0bcd23c56761a",
+        "android_client_info": {
+          "package_name": "com.aravind.composefitnessapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ0q-jpDZ3zJBPfVoHdy9CYpX4TgVEML4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

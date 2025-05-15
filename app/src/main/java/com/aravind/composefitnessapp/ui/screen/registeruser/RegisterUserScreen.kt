@@ -1,5 +1,6 @@
 package com.aravind.composefitnessapp.ui.screen.registeruser
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -24,6 +26,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -31,24 +34,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.aravind.composefitnessapp.R
+import com.aravind.composefitnessapp.ui.screen.loginuser.LoginScreen
 import com.aravind.composefitnessapp.ui.theme.Black
 import com.aravind.composefitnessapp.ui.theme.GradientEnd
 import com.aravind.composefitnessapp.ui.theme.GradientStart
@@ -56,10 +65,91 @@ import com.aravind.composefitnessapp.ui.theme.Grey2
 import com.aravind.composefitnessapp.ui.theme.Grey3
 import com.aravind.composefitnessapp.ui.theme.Pink1
 import com.aravind.composefitnessapp.ui.theme.poppinsFamily
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+
+fun registerUser(
+    fullName: String,
+    phone: String,
+    email: String,
+    password: String,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                val user = hashMapOf(
+                    "fullName" to fullName,
+                    "phone" to phone,
+                    "email" to email
+                )
+
+                // Save basic user data to Firestore in the "users" collection
+                db.collection("users").document(userId).set(user)
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { e -> onError(e.message ?: "Failed to save user") }
+            } else {
+                onError(task.exception?.message ?: "Registration failed")
+            }
+        }
+}
+fun updateProfile(
+    gender: String="male",
+    dateOfBirth: String,
+    weight: String,
+    height: String,
+    age:String
+) {
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    val db = FirebaseFirestore.getInstance()
+
+
+    userId?.let {
+        val profileData = hashMapOf(
+            "gender" to gender,
+            "dob" to dateOfBirth,
+            "weight" to weight,
+            "height" to height,
+            "age" to age
+        )
+
+
+        db.collection("users").document(it)
+            .update(profileData as Map<String, Any>)
+
+    }
+}
+
+fun isValidEgyptianPhone(phone: String): Boolean {
+    return Regex("^(010|011|012|015)\\d{8}$").matches(phone)
+}
+fun validatePassword(password: String): String? {
+    if (password.length < 8) return "Password must be at least 8 characters"
+    if (!password.any { it.isLetter() }) return "Password must contain letters"
+    if (!password.any { it.isDigit() }) return "Password must contain numbers"
+    if (!password.any { "!@#\$%^&*()_+-=[]|,./?><".contains(it) }) return "Password must contain special characters"
+    return null
+}
+
+/////////////////////////////////////////////////
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
+fun RegisterUserScreen(onRegisterSuccess: () -> Unit,onNavigateToLogin: () -> Unit) {
+
+    var passwordError by rememberSaveable { mutableStateOf<String?>(null) }
+    var phoneError by rememberSaveable { mutableStateOf(false) }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+
+
     Column(modifier = Modifier.fillMaxSize().background(Color.White), verticalArrangement = Arrangement.SpaceBetween) {
         Column(
             horizontalAlignment = Alignment.Start,
@@ -124,7 +214,13 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                 TextField(
                     singleLine = true,
                     value = phoneNumber,
-                    onValueChange = { phoneNumber = it },
+                    onValueChange = {
+                        if (it.length <= 11 && it.all { c -> c.isDigit() }) {
+                            phoneNumber = it
+                            phoneError = false
+                        }
+                    },
+                    isError = phoneError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     label = {
                         Text(
@@ -150,6 +246,16 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                         disabledIndicatorColor = Color.Transparent,
                     )
                 )
+
+                if (phoneError) {
+                    Text(
+                        text = "Invalid phone number. It must start with 010, 011, 012, or 015 and be 11 digits long.",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(20.dp))
                 var email by remember { mutableStateOf("") }
                 TextField(
@@ -181,12 +287,15 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                         disabledIndicatorColor = Color.Transparent,
                     )
                 )
+
                 Spacer(modifier = Modifier.height(20.dp))
                 var password by remember { mutableStateOf("") }
                 TextField(
                     singleLine = true,
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { password = it
+                        passwordError = validatePassword(it)
+                        },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     label = {
                         Text(
@@ -203,6 +312,15 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                             contentDescription = null
                         )
                     },
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     shape = RoundedCornerShape(15.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
@@ -210,7 +328,13 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-                    )
+                    ),
+                    isError = passwordError != null,
+                    supportingText = {
+                        passwordError?.let {
+                            Text(text = it, color = Color.Red, fontSize = 12.sp)
+                        }
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -272,7 +396,11 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
                         shape = ButtonDefaults.shape
                     )
                     .height(55.dp),
-                onClick = { onRegisterSuccess()},
+                onClick = {
+
+                    onRegisterSuccess()
+
+                          },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
             ) {
                 Text(
@@ -353,9 +481,14 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
             ), onClick = { offset ->
                 annotatedString.getStringAnnotations(offset, offset)
                     .firstOrNull()?.let { span ->
+                        if (span.tag == loginString) {
+                            onNavigateToLogin()// هذا هو السطر الصحيح للتنقل
+                        }
+
                         println("Clicked on ${span.item}")
                     }
             })
+
 
         }
     }
@@ -365,5 +498,5 @@ fun RegisterUserScreen(onRegisterSuccess: () -> Unit) {
 @Preview
 @Composable
 fun RegisterUserPreview() {
-    RegisterUserScreen(onRegisterSuccess = {})
+    RegisterUserScreen(onRegisterSuccess = {}, onNavigateToLogin = {})
 }
